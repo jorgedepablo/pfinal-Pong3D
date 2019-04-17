@@ -27,10 +27,10 @@
       document.body.appendChild(renderer.domElement);
 
       var light = getLight();
-      var leftBorder = getBorder("left", 1, 20, 2, -5, 0, 0);
-      var rightBorder = getBorder("right", 1, 20, 2, 5, 0, 0);
-      var topBorder = getBorder("top", 11, 1, 2, 0, 10, 0);
-      var downBorder = getBorder("down", 9, 1, 2, 0, -9.5, 0);
+      var leftBorder = getBorder("left", 1, 20, 2, -10, 0, 0);
+      var rightBorder = getBorder("right", 1, 20, 2, 10, 0, 0);
+      var topBorder = getBorder("top", 4, 1, 2, 0, 10, 0);
+      var downBorder = getBorder("down", 4, 1, 2, 0, -9.5, 0);
       var sphere = getSphere();
       var floor = getFloor();
 
@@ -87,7 +87,7 @@
    }
 
    function getFloor() {
-      var geometry = new THREE.PlaneGeometry(10, 20);
+      var geometry = new THREE.PlaneGeometry(20, 20);
       var mesh = new THREE.Mesh(geometry, getWoodMaterial());
       mesh.receiveShadow = true;
 
@@ -105,7 +105,7 @@
    }
 
    function getWoodMaterial() {
-      var texture = new THREE.TextureLoader().load("wood.png");
+      var texture = new THREE.TextureLoader().load("azul.jpg");
       var material = new THREE.MeshPhysicalMaterial({
          map : texture
       });
