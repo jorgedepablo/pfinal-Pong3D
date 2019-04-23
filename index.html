@@ -27,10 +27,10 @@
       document.body.appendChild(renderer.domElement);
 
       var light = getLight();
-      var leftBorder = getBorder("left", 1, 20, 2, -10, 0, 0);
-      var rightBorder = getBorder("right", 1, 20, 2, 10, 0, 0);
-      var topBorder = getBorder("top", 4, 1, 2, 0, 10, 0);
-      var downBorder = getBorder("down", 4, 1, 2, 0, -9.5, 0);
+      var leftBorder = getBorder("left", 1, 20, 3, -10, 0, 0);
+      var rightBorder = getBorder("right", 1, 20, 3, 10, 0, 0);
+      var topBorder = getBorder("top", 4, 1, 3, 0, 10, 0);
+      var downBorder = getBorder("down", 4, 1, 3, 0, -9.5, 0);
       var sphere = getSphere();
       var floor = getFloor();
 
@@ -47,11 +47,38 @@
       animate(sphere, borders, renderer, scene, camera);
    }
 
+   function move_paddle(paddle){
+       window.onkeydown = (p) => {
+           p.preventDefault();
+           switch (p.key) {
+               case 'ArrowLeft':
+                    console.log('hola');
+                    paddle.position.x -= 0.5;
+                    break;
+                case 'ArrowRight':
+                    paddle.position.x += 0.5;
+                    break;
+                default:
+                    break;
+            }
+        };
+    }
+
+    function move_CPU(cpu, ball){
+        cpu.position.x = ball.position.x;
+    }
+
    function animate(sphere, borders, renderer, scene, camera) {
       checkCollision(sphere, borders);
 
       sphere.position.x += stepX;
       sphere.position.y += stepY;
+
+      paddle = borders[3];
+      move_paddle(paddle);
+
+      cpu = borders[2];
+      move_CPU(cpu, sphere);
 
       renderer.render(scene, camera);
 
@@ -111,32 +138,35 @@
       });
       material.map.wrapS = material.map.wrapT = THREE.RepeatWrapping;
       material.map.repeat.set(4, 4);
-      material.side = THREE.DoubleSide;
+      material.side = THREE.DoubleSideb;
 
       return material;
    }
 
-   function checkCollision(sphere, borders) {
-      var originPosition = sphere.position.clone();
+   function checkCollision(ball, borders) {
+       left_border = borders[0];
+       right_border = borders[1];
+       cpu = borders[2];
+       paddle = borders[3];
 
-      for (var i = 0; i < sphere.geometry.vertices.length; i++) {
-         var localVertex = sphere.geometry.vertices[i].clone();
-         var globalVertex = localVertex.applyMatrix4(sphere.matrix);
-         var directionVector = globalVertex.sub(sphere.position);
-         var ray = new THREE.Raycaster(originPosition, directionVector.clone().normalize());
-         var collisionResults = ray.intersectObjects(borders);
-         if (collisionResults.length > 0 && collisionResults[0].distance < directionVector.length()) {
-            // Collision detected
-            if (collisionResults[0].object.name == "left" || collisionResults[0].object.name == "right") {
-               stepX *= -1;
-            }
-            if (collisionResults[0].object.name == "down" || collisionResults[0].object.name == "top") {
+       if (ball.position.x >= (10 - 1) || ball.position.x <= (-10 + 1)){
+           stepX *= -1;
+       }
+
+       if ((ball.position.y + 1) <= cpu.position.y && (ball.position.y + 1) >= cpu.position.y){
+           console.log(ball.position.x, cpu.position.x);
+           if (ball.position.x >= (cpu.position.x - 4/2)  &&  ball.position.x  <= (cpu.position.x + 4/2)) {
                stepY *= -1;
-            }
-            break;
-         }
-      }
-   }
+           }
+       }
+
+       if ((ball.position.y - 1) >= paddle.position.y && (ball.position.y - 1) <= paddle.position.y ){
+           if (ball.position.x >= (paddle.position.x - 4/2) && ball.position.x <= (paddle.position.x + 4/2)){
+               stepY *= -1;
+           }
+       }
+
+    }
 </script>
 </head>
 
