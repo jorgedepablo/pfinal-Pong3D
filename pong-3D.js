@@ -1,27 +1,34 @@
 var stepX = 0.15;
 var stepY = 0.25;
 
+var postLeftBorder = -10;
+var posRigthBorder = 10;
+var paddleLong = 3;
+var cpuLong = 3;
+var ballSize = 1;
+
 function init() {
    var scene = new THREE.Scene();
    var sceneWidth = window.innerWidth;
    var sceneHeight = window.innerHeight;
 
    var camera = new THREE.PerspectiveCamera(90, sceneWidth / sceneHeight, 0.01, 100);
-   camera.position.set(0, -10, 15);
+   camera.position.set(0, -15, 15);
    camera.lookAt(scene.position);
 
    var renderer = new THREE.WebGLRenderer({
       antialias : true
    });
+
    renderer.shadowMap.enabled = true;
    renderer.setSize(sceneWidth, sceneHeight);
    document.body.appendChild(renderer.domElement);
 
    var light = getLight();
-   var leftBorder = getBorder("left", 1, 20, 3, -10, 0, 0);
-   var rightBorder = getBorder("right", 1, 20, 3, 10, 0, 0);
-   var topBorder = getBorder("top", 4, 1, 3, 0, 10, 0);
-   var downBorder = getBorder("down", 4, 1, 3, 0, -9.5, 0);
+   var leftBorder = getBorder("left", 1, 20, 3, postLeftBorder, 0, 1.5);
+   var rightBorder = getBorder("right", 1, 20, 3, posRigthBorder, 0, 1.5);
+   var topBorder = getBorder("top", 4, 1, paddleLong, 0, 9.5, 1);
+   var downBorder = getBorder("down", 4, 1, cpuLong, 0, -9.5, 1);
    var sphere = getSphere();
    var floor = getFloor();
 
@@ -43,10 +50,14 @@ function move_paddle(paddle){
         p.preventDefault();
         switch (p.key) {
             case 'ArrowLeft':
-                 paddle.position.x -= 0.80;
+                 if (paddle.position.x >= -7 ){
+                     paddle.position.x -= 0.25;
+                 }
                  break;
              case 'ArrowRight':
-                 paddle.position.x += 0.80;
+                 if (paddle.position.x <= 7){
+                     paddle.position.x += 0.25;
+                 }
                  break;
              default:
                  break;
@@ -55,11 +66,14 @@ function move_paddle(paddle){
  }
 
  function move_CPU(cpu, ball){
-     cpu.position.x = ball.position.x;
+     if (ball.position.x >= -7 && ball.position.x <= 7){
+         cpu.position.x = ball.position.x;
+     }
  }
 
 function animate(sphere, borders, renderer, scene, camera) {
    checkCollision(sphere, borders);
+   checkGoal(sphere);
 
    sphere.position.x += stepX;
    sphere.position.y += stepY;
@@ -93,7 +107,7 @@ function getLight() {
 }
 
 function getSphere() {
-   var geometry = new THREE.SphereGeometry(1, 20, 20);
+   var geometry = new THREE.SphereGeometry(ballSize, 20, 20);
    var material = new THREE.MeshNormalMaterial();
    var mesh = new THREE.Mesh(geometry, getMaterial('ball'));
    mesh.position.z = 1;
@@ -157,26 +171,32 @@ function getMaterial(type) {
 }
 
 function checkCollision(ball, borders) {
-    left_border = borders[0];
-    right_border = borders[1];
-    cpu = borders[2];
-    paddle = borders[3];
+    var left_border = borders[0];
+    var right_border = borders[1];
+    var cpu = borders[2];
+    var paddle = borders[3];
 
-    if (ball.position.x >= (10 - 1) || ball.position.x <= (-10 + 1)){
+
+    if (ball.position.x >= (posRigthBorder - ballSize) || ball.position.x <= (postLeftBorder + ballSize)){
         stepX *= -1;
     }
 
-    if ((ball.position.y + 1) <= cpu.position.y && (ball.position.y + 1) >= cpu.position.y){
-        console.log(ball.position.x, cpu.position.x);
-        if (ball.position.x >= (cpu.position.x - 4/2)  &&  ball.position.x  <= (cpu.position.x + 4/2)) {
+    if ((ball.position.y + ballSize) <= cpu.position.y && (ball.position.y + ballSize) >= cpu.position.y){
+        if (ball.position.x >= (cpu.position.x - cpuLong)  &&  ball.position.x  <= (cpu.position.x + cpuLong)) {
             stepY *= -1;
         }
     }
 
-    if ((ball.position.y - 1) >= paddle.position.y && (ball.position.y - 1) <= paddle.position.y ){
-        if (ball.position.x >= (paddle.position.x - 4/2) && ball.position.x <= (paddle.position.x + 4/2)){
+    if ((ball.position.y - ballSize) >= paddle.position.y && (ball.position.y - ballSize) <= paddle.position.y ){
+        if (ball.position.x >= (paddle.position.x - paddleLong) && ball.position.x <= (paddle.position.x + paddleLong)){
             stepY *= -1;
         }
     }
+ }
+
+ function checkGoal(ball){
+     if (ball.position.y > 20){
+         stepY *= -1;
+     }
 
  }
