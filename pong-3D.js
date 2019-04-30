@@ -9,8 +9,8 @@ var ballSize = 1;
 
 var paddlePoints = 0;
 var cpuPoints = 0;
-
 var start = false;
+
 
 function init() {
    var scene = new THREE.Scene();
@@ -48,6 +48,7 @@ function init() {
    var borders = [ leftBorder, rightBorder, topBorder, downBorder ];
 
    animate(sphere, borders, renderer, scene, camera);
+
 }
 
 function move_paddle(paddle){
@@ -56,12 +57,12 @@ function move_paddle(paddle){
         switch (p.key) {
             case 'ArrowLeft':
                  if (paddle.position.x >= -7 ){
-                     paddle.position.x -= 0.25;
+                     paddle.position.x -= 0.35;
                  }
                  break;
              case 'ArrowRight':
                  if (paddle.position.x <= 7){
-                     paddle.position.x += 0.25;
+                     paddle.position.x += 0.35;
                  }
                  break;
              case ' ':
@@ -73,10 +74,18 @@ function move_paddle(paddle){
      };
  }
 
+ function getRandomArbitrary(min, max) {
+    return Math.random() * (max - min) + min;
+ }
+
  function move_CPU(cpu, ball){
-     if (ball.position.x >= -7 && ball.position.x <= 7){
-         cpu.position.x = ball.position.x;
-     }
+    cpu.position.x = ball.position.x * 0.5;
+    if (cpu.position.x >= 7){
+        cpu.position.x = 7;
+    }
+    if (cpu.position.x <= -7){
+        cpu.position.x = -7;
+    }
  }
 
 function animate(sphere, borders, renderer, scene, camera) {
@@ -109,8 +118,8 @@ function getLight() {
    light.shadow.camera.far = 20;
    light.shadow.camera.left = -20;
    light.shadow.camera.right = 20;
-   light.shadow.camera.top = 10;
-   light.shadow.camera.bottom = -10;
+   light.shadow.camera.top = 15;
+   light.shadow.camera.bottom = -15;
    light.shadow.mapSize.width = 4096;
    light.shadow.mapSize.height = 4096;
    return light;
@@ -208,15 +217,16 @@ function checkCollision(ball, borders) {
      if (ball.position.y < -10){
          ball.position.x = 0;
          ball.position.y = 0;
-         stepX = 0.15;
-         stepY = 0.25;
+         stepX = -stepX;
+         stepY = -stepY;
          cpuPoints += 1;
      }
 
      if (ball.position.y > 10){
          ball.position.x = 0;
-         stepX = -0.15;
-         stepY = -0.25;
+          ball.position.y = 0;
+         stepX = -stepX;
+         stepY = -stepY;
          paddlePoints += 1;
      }
 
