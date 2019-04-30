@@ -45,7 +45,7 @@ function init() {
    scene.add(sphere);
    scene.add(floor);
 
-   var borders = [ leftBorder, rightBorder, topBorder, downBorder ];
+   var borders = [ leftBorder, rightBorder, topBorder, downBorder];
 
    animate(sphere, borders, renderer, scene, camera);
 
@@ -74,11 +74,7 @@ function move_paddle(paddle){
      };
  }
 
- function getRandomArbitrary(min, max) {
-    return Math.random() * (max - min) + min;
- }
-
- function move_CPU(cpu, ball){
+function move_CPU(cpu, ball){
     cpu.position.x = ball.position.x * 0.6;
     if (cpu.position.x >= 7){
         cpu.position.x = 7;
@@ -194,7 +190,6 @@ function checkCollision(ball, borders) {
     var right_border = borders[1];
     var cpu = borders[2];
     var paddle = borders[3];
-
 
     if (ball.position.x >= (posRigthBorder - ballSize) || ball.position.x <= (postLeftBorder + ballSize)){
         stepX *= -1;
