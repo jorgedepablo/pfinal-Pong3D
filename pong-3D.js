@@ -3,9 +3,14 @@ var stepY = 0.25;
 
 var postLeftBorder = -10;
 var posRigthBorder = 10;
-var paddleLong = 3;
-var cpuLong = 3;
+var paddleLong = 4;
+var cpuLong = 4;
 var ballSize = 1;
+
+var paddlePoints = 0;
+var cpuPoints = 0;
+
+var start = false;
 
 function init() {
    var scene = new THREE.Scene();
@@ -27,8 +32,8 @@ function init() {
    var light = getLight();
    var leftBorder = getBorder("left", 1, 20, 3, postLeftBorder, 0, 1.5);
    var rightBorder = getBorder("right", 1, 20, 3, posRigthBorder, 0, 1.5);
-   var topBorder = getBorder("top", 4, 1, paddleLong, 0, 9.5, 1);
-   var downBorder = getBorder("down", 4, 1, cpuLong, 0, -9.5, 1);
+   var topBorder = getBorder("top", cpuLong, 1, 2, 0, 9.5, 1);
+   var downBorder = getBorder("down", paddleLong, 1, 2, 0, -9.5, 1);
    var sphere = getSphere();
    var floor = getFloor();
 
@@ -59,6 +64,9 @@ function move_paddle(paddle){
                      paddle.position.x += 0.25;
                  }
                  break;
+             case ' ':
+                start = true;
+                break;
              default:
                  break;
          }
@@ -75,8 +83,10 @@ function animate(sphere, borders, renderer, scene, camera) {
    checkCollision(sphere, borders);
    checkGoal(sphere);
 
-   sphere.position.x += stepX;
-   sphere.position.y += stepY;
+   if(start){
+       sphere.position.x += stepX;
+       sphere.position.y += stepY;
+   }
 
    paddle = borders[3];
    move_paddle(paddle);
@@ -93,12 +103,12 @@ function animate(sphere, borders, renderer, scene, camera) {
 
 function getLight() {
    var light = new THREE.DirectionalLight();
-   light.position.set(4, 4, 4);
+   light.position.set(5, 5, 5);
    light.castShadow = true;
-   light.shadow.camera.near = 0;
-   light.shadow.camera.far = 16;
-   light.shadow.camera.left = -8;
-   light.shadow.camera.right = 5;
+   light.shadow.camera.near = -10;
+   light.shadow.camera.far = 20;
+   light.shadow.camera.left = -20;
+   light.shadow.camera.right = 20;
    light.shadow.camera.top = 10;
    light.shadow.camera.bottom = -10;
    light.shadow.mapSize.width = 4096;
@@ -182,21 +192,40 @@ function checkCollision(ball, borders) {
     }
 
     if ((ball.position.y + ballSize) <= cpu.position.y && (ball.position.y + ballSize) >= cpu.position.y){
-        if (ball.position.x >= (cpu.position.x - cpuLong)  &&  ball.position.x  <= (cpu.position.x + cpuLong)) {
+        if (ball.position.x + ballSize >= (cpu.position.x - cpuLong/2)  &&  ball.position.x -  ballSize <= (cpu.position.x + cpuLong/2)) {
             stepY *= -1;
         }
     }
 
     if ((ball.position.y - ballSize) >= paddle.position.y && (ball.position.y - ballSize) <= paddle.position.y ){
-        if (ball.position.x >= (paddle.position.x - paddleLong) && ball.position.x <= (paddle.position.x + paddleLong)){
+        if (ball.position.x + ballSize >= (paddle.position.x - paddleLong/2) && ball.position.x - ballSize  <= (paddle.position.x + paddleLong/2)){
             stepY *= -1;
         }
     }
  }
 
  function checkGoal(ball){
-     if (ball.position.y > 20){
-         stepY *= -1;
+     if (ball.position.y < -10){
+         ball.position.x = 0;
+         ball.position.y = 0;
+         stepX = 0.15;
+         stepY = 0.25;
+         cpuPoints += 1;
      }
+
+     if (ball.position.y > 10){
+         ball.position.x = 0;
+         stepX = -0.15;
+         stepY = -0.25;
+         paddlePoints += 1;
+     }
+
+     if (paddlePoints > 4 || cpuPoints > 4){
+         cpuPoints = 0;
+         paddlePoints = 0;
+         start = false;
+     }
+
+     document.getElementById("scores").innerHTML = (cpuPoints + '-' + paddlePoints);
 
  }
