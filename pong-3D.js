@@ -79,7 +79,7 @@ function move_paddle(paddle){
  }
 
  function move_CPU(cpu, ball){
-    cpu.position.x = ball.position.x * 0.5;
+    cpu.position.x = ball.position.x * 0.6;
     if (cpu.position.x >= 7){
         cpu.position.x = 7;
     }
